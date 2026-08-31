@@ -2,7 +2,7 @@ const autoBind = require("auto-bind");
 const UserModel = require("../user/user.model");
 const createHttpError = require("http-errors");
 const AuthMessage = require("./auth.messages");
-const randomInt = require('crypto')
+const { randomInt } = require('crypto')
 
 class AuthService {
     #model;

@@ -13,9 +13,9 @@ async function main() {
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
     SwaggerConfig(app)
+    app.use(mainRouter)
     NotFoundHandler(app)
     AllExceptionHandler(app)
-    app.use(mainRouter)
     app.listen(port, () => console.log(`server run on port ${port}`))
 }
 main()
