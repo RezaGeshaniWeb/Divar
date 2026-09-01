@@ -1,9 +1,9 @@
 const autoBind = require("auto-bind");
 const CategoryModel = require("./category.model");
-const { isValidObjectId } = require("mongoose");
+const { isValidObjectId, Types } = require("mongoose");
 const createHttpError = require("http-errors");
 const CategoryMessage = require("./category.messages");
-const { slugify } = require("slugify")
+const slugify = require("slugify");
 
 class CategoryService {
     #model;
@@ -15,26 +15,36 @@ class CategoryService {
 
     async create(categoryDto) {
         if (categoryDto?.parent && isValidObjectId(categoryDto.parent)) {
-            const existCategory = await this.checkExistById(categoryDto.parent)
-            categoryDto.parent = existCategory._id
+            const existCategory = await this.checkExistById(categoryDto.parent);
+            categoryDto.parent = existCategory._id;
             categoryDto.parents = [
                 ...new Set(
                     ([existCategory._id.toString()].concat(
-                        existCategory.parents.map(id => id.toString())
+                        (existCategory.parents || []).map(id => id.toString())
                     )).map(id => new Types.ObjectId(id))
                 )
-            ]
+            ];
+        } else {
+            delete categoryDto.parent;
         }
 
         if (categoryDto?.slug) {
-            categoryDto.slug = slugify(category.slug)
-            await this.alreadyExistBySlug(categoryDto.slug)
-        } else {
-            categoryDto.slug = slugify(categoryDto.name)
+            categoryDto.slug = slugify(categoryDto.slug, { lower: true });
+            await this.alreadyExistBySlug(categoryDto.slug);
+        } else if (categoryDto?.name) {
+            categoryDto.slug = slugify(categoryDto.name, { lower: true });
         }
 
         const category = await this.#model.create(categoryDto)
         return category;
+    }
+
+    async find() {
+        return await this.#model.find({ parent: { $exists: false } })
+            .populate({
+                path: "children",
+                populate: { path: "children" } 
+            });
     }
 
     async checkExistById(id) {
@@ -51,7 +61,7 @@ class CategoryService {
 
     async alreadyExistBySlug(slug) {
         const category = await this.#model.findOne({ slug })
-        if (!category) throw new createHttpError.Conflict(CategoryMessage.AlreadyExist)
+        if (category) throw new createHttpError.Conflict(CategoryMessage.AlreadyExist)
         return null;
     }
 }

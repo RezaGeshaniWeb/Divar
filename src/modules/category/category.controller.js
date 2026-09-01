@@ -1,7 +1,7 @@
 const autoBind = require("auto-bind");
 const categoryService = require("./category.service");
 const CategoryMessage = require("./category.messages");
-const { default: httpCodes } = require("http-codes");
+const httpCodes = require("http-codes");
 
 class CategoryController {
     #service;

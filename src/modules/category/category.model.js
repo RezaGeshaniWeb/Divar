@@ -14,6 +14,6 @@ CategorySchema.virtual("children", {
     foreignField: "parent"
 })
 
-const CategoryModel = model("category", CategorySchema)
+const CategoryModel = model("Category", CategorySchema)
 
 module.exports = CategoryModel;
