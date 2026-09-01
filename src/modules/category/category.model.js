@@ -6,7 +6,7 @@ const CategorySchema = new Schema({
     icon: { type: String, required: true },
     parent: { type: Types.ObjectId, ref: "Category", required: false },
     parents: { type: [Types.ObjectId], ref: "Category", required: false, default: [] },
-}, { virtuals: true, versionKey: false, id: false })
+}, { versionKey: false, id: false, toJSON: { virtuals: true } })
 
 CategorySchema.virtual("children", {
     ref: "Category",
