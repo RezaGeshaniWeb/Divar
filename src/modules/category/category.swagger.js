@@ -9,11 +9,10 @@
  * @swagger
  *  components:
  *      schemas:
- *          CreateCategoory:
+ *          CreateCategory:
  *              type: object
  *              required:
  *                  -   name
- *                  -   slug
  *                  -   icon
  *              properties:
  *                  name:
@@ -41,6 +40,9 @@
  *              application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/CreateCategory'
+ *      responses:
+ *          200:
+ *              description: successfully
  */
 /**
  * @swagger
