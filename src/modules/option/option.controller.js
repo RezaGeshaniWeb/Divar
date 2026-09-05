@@ -1,7 +1,7 @@
 const autoBind = require("auto-bind");
 const optionService = require("./option.service");
 const OptionMessage = require("./option.messages");
-const { default: httpCodes } = require("http-codes");
+const httpCodes = require("http-codes");
 
 class OptionController {
     #service;
@@ -23,6 +23,15 @@ class OptionController {
         }
     }
 
+    async find(req, res, next) {
+        try {
+            const options = await this.#service.find()
+            res.json(options)
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async findByCategoryId(req, res, next) {
         try {
 
@@ -32,14 +41,6 @@ class OptionController {
     }
 
     async findById(req, res, next) {
-        try {
-
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async find(req, res, next) {
         try {
 
         } catch (error) {
