@@ -15,7 +15,7 @@ class OptionController {
         try {
             const { title, key, guide, enum: list, type, category } = req.body;
             await this.#service.create({ title, key, guide, enum: list, type, category })
-            return  res.status(httpCodes.CREATED).json({
+            return res.status(httpCodes.CREATED).json({
                 message: OptionMessage.Created
             })
         } catch (error) {
@@ -32,17 +32,21 @@ class OptionController {
         }
     }
 
-    async findByCategoryId(req, res, next) {
+    async findById(req, res, next) {
         try {
-
+            const { id } = req.params
+            const options = await this.#service.findById(id)
+            return res.json(options)
         } catch (error) {
             next(error)
         }
     }
 
-    async findById(req, res, next) {
+    async findByCategoryId(req, res, next) {
         try {
-
+            const { categoryId } = req.params
+            const options = await this.#service.findByCategoryId(categoryId)
+            return res.json(options)
         } catch (error) {
             next(error)
         }

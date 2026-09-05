@@ -59,7 +59,7 @@
  */
 /**
  * @swagger
- * /option/bg-category/{categoryId}:
+ * /option/by-category/{categoryId}:
  *  get:
  *      summary: get all options of category
  *      tags:

@@ -32,6 +32,14 @@ class OptionService {
         return options;
     }
 
+    async findById(id) {
+        return await this.checkExistById(id)
+    }
+
+    async findByCategoryId(category) {
+        return await this.#model.find({ category }, { __v: 0 }).populate([{ path: "category", select: { name: 1, slug: 1 } }])
+    }
+
     async checkExistById(id) {
         const category = await this.#categoryModel.findById(id)
         if (!category) throw new createHttpError.NotFound(OptionMessage.NotFound)
