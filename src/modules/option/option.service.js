@@ -3,16 +3,13 @@ const OptionModel = require("./option.model");
 const createHttpError = require("http-errors");
 const OptionMessage = require("./option.messages");
 const slugify = require("slugify");
-const CategoryModel = require("../category/category.model");
 
 class OptionService {
     #model;
-    #categoryModel;
 
     constructor() {
         autoBind(this)
         this.#model = OptionModel;
-        this.#categoryModel = CategoryModel;
     }
 
     async create(optionDto) {
@@ -75,10 +72,15 @@ class OptionService {
         return options
     }
 
+    async removeById(id) {
+        await this.checkExistById(id)
+        return await this.#model.deleteOne({ _id: id })
+    }
+
     async checkExistById(id) {
-        const category = await this.#categoryModel.findById(id)
-        if (!category) throw new createHttpError.NotFound(OptionMessage.NotFound)
-        return category
+        const option = await this.#model.findById(id)
+        if (!option) throw new createHttpError.NotFound(OptionMessage.NotFound)
+        return option
     }
 
     async alreadyExistByCategoryAndKey(key, category) {
