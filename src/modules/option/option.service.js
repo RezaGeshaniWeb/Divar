@@ -3,23 +3,29 @@ const OptionModel = require("./option.model");
 const createHttpError = require("http-errors");
 const OptionMessage = require("./option.messages");
 const slugify = require("slugify");
+const categoryService = require("../category/category.service");
+const { isTrue, isFalse } = require("../../common/utils/functions");
 
 class OptionService {
     #model;
+    #categoryService;
 
     constructor() {
         autoBind(this)
         this.#model = OptionModel;
+        this.#categoryService = categoryService
     }
 
     async create(optionDto) {
-        const category = await this.checkExistById(optionDto.category)
+        const category = await this.#categoryService.checkExistById(optionDto.category)
         optionDto.category = category._id
         optionDto.key = slugify(optionDto.key, { trim: true, replacement: "_", lower: true })
         await this.alreadyExistByCategoryAndKey(optionDto.key, category._id)
         if (optionDto.enum && typeof optionDto.enum === "string") {
             optionDto.enum = optionDto.enum.split(",")
         } else if (Array.isArray(optionDto.enum)) optionDto.enum = []
+        if (isTrue(optionDto?.required)) optionDto.required = true;
+        if (isFalse(optionDto?.required)) optionDto.required = false;
         const option = await this.#model.create(optionDto)
         return option;
     }
