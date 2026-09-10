@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
 const PostSchema = new Schema({
     title: { type: String, required: true },
@@ -9,6 +9,8 @@ const PostSchema = new Schema({
     district: { type: String, required: true },
     cordinate: { type: [Number], required: true },
     images: { type: [String], required: false, default: [] },
+}, {
+    timestamps: true
 })
 
 const PostModel = model("Post", PostSchema)
