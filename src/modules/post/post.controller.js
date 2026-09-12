@@ -5,6 +5,7 @@ const CategoryModel = require("../category/category.model");
 const createHttpError = require("http-errors");
 const { default: httpCodes } = require("http-codes");
 const { Types } = require("mongoose");
+const { default: axios } = require("axios");
 
 class PostController {
     #service;
@@ -43,6 +44,11 @@ class PostController {
     async createPostPage(req, res, next) {
         try {
             const { title_post: title, description: content, lat, lng, category } = req.body;
+            const result = await axios.get(`${process.env.MAP_IR_URL}?lat=${lat}&lon=${lng}`, {
+                headers: {
+                    'x-api-key': process.env.MAP_API_KEY
+                }
+            }).then(res => res.data)
             delete req.body['title_post']
             delete req.body['description']
             delete req.body['lat']
@@ -50,7 +56,7 @@ class PostController {
             delete req.body['category']
             delete req.body['images']
             const options = req.body
-            await this.#service.create({ title, content, category: new Types.ObjectId(category), cordinate: [lat, lng], images: [], options })
+            await this.#service.create({ title, content, category: new Types.ObjectId(category), cordinate: [lat, lng], images: [], options, address: result.address,province: result.province, city: result.city, district: result.region })
             return res.status(httpCodes.CREATED).json({
                 message: PostMessage.Created
             })

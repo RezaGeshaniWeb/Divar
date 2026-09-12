@@ -7,6 +7,7 @@ const PostSchema = new Schema({
     province: { type: String, required: false },
     city: { type: String, required: false },
     district: { type: String, required: false },
+    address: { type: String, required: false },
     cordinate: { type: [Number], required: true },
     images: { type: [String], required: false, default: [] },
     options: { type: Object, default: {} }
