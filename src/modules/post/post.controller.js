@@ -3,6 +3,7 @@ const PostMessage = require("./post.messages");
 const postService = require("./post.service");
 const CategoryModel = require("../category/category.model");
 const createHttpError = require("http-errors");
+const { default: httpCodes } = require("http-codes");
 
 class PostController {
     #service;
@@ -33,6 +34,18 @@ class PostController {
                 $match: match
             }])
             res.render("./pages/panel/create-post.ejs", { categories, showBack, options })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async createPostPage(req, res, next) {
+        try {
+            const { name, icon, slug, parent } = req.body;
+            await this.#service.create({ name, icon, slug, parent })
+            return res.status(httpCodes.CREATED).json({
+                message: PostMessage.Created
+            })
         } catch (error) {
             next(error)
         }
