@@ -43,11 +43,12 @@ class PostController {
     async createPostPage(req, res, next) {
         try {
             const { title_post: title, description: content, lat, lng, category } = req.body;
-            delete re.body['title_post']
-            delete re.body['description']
-            delete re.body['lat']
-            delete re.body['lng']
-            delete re.body['category']
+            delete req.body['title_post']
+            delete req.body['description']
+            delete req.body['lat']
+            delete req.body['lng']
+            delete req.body['category']
+            delete req.body['images']
             const options = req.body
             await this.#service.create({ title, content, category: new Types.ObjectId(category), cordinate: [lat, lng], images: [], options })
             return res.status(httpCodes.CREATED).json({
