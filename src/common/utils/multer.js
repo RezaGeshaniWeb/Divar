@@ -16,7 +16,6 @@ const storage = multer.diskStorage({
         } else {
             cb(new createHttpError.BadRequest("format of pictures are wrong!"));
         }
-
     }
 });
 const upload = multer({

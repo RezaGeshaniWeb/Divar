@@ -5,7 +5,9 @@ const CategoryModel = require("../category/category.model");
 const createHttpError = require("http-errors");
 const { default: httpCodes } = require("http-codes");
 const { Types } = require("mongoose");
-const { default: axios } = require("axios");
+const { removePropertyInObject } = require("../../common/utils/functions");
+const { getAddressDetail } = require("../../common/utils/http");
+const utf8 = require("utf8")
 
 class PostController {
   #service;
@@ -48,10 +50,10 @@ class PostController {
     }
   }
 
-  async createPostPage(req, res, next) {
+  async create(req, res, next) {
     try {
+      const images = req?.files?.map(image => image?.path?.slice(7))
       const { title_post: title, description: content, lat, lng, category } = req.body;
-      const { address, province, city, district } = await getAddressDetail(lat, lng);
       const options = removePropertyInObject(req.body, [
         "title_post",
         "description",
@@ -60,12 +62,19 @@ class PostController {
         "category",
         "images",
       ]);
+      for (let key in options) {
+        let value = options[key]
+        delete options[key]
+        key = utf8.decode(key)
+        options[key] = value
+      }
+      const { address, province, city, district } = await getAddressDetail(lat, lng);
       await this.#service.create({
         title,
         content,
         category: new Types.ObjectId(category),
         cordinate: [lat, lng],
-        images: [],
+        images,
         options,
         address,
         province,
