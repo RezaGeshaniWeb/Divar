@@ -4,6 +4,7 @@ const OptionModel = require("../option/option.model");
 const { isValidObjectId } = require("mongoose");
 const createHttpError = require("http-errors");
 const PostMessage = require("./post.messages");
+const { Types } = require("mongoose");
 
 class PostService {
     #model;
@@ -27,7 +28,33 @@ class PostService {
     async checkExist(postId) {
         if (!postId || !isValidObjectId(postId))
             throw new createHttpError.BadRequest(PostMessage.RequestNotValid)
-        const post = await this.#model.findById(postId)
+        const [post] = await this.#model.aggregate([
+            { $match: { _id: new Types.ObjectId(postId) } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    userMobile: "$user.mobile"
+                }
+            },
+            {
+                $project: {
+                    user: 0
+                }
+            }
+        ])
         if (!post)
             throw new createHttpError.NotFound(PostMessage.NotFound)
         return post
