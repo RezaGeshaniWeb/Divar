@@ -88,6 +88,15 @@ class PostController {
       next(error);
     }
   }
+
+  async find(req, res, next) {
+    try {
+      const posts = await this.#service.find()
+      return res.render("./pages/panel/create-post.ejs", { posts })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new PostController();

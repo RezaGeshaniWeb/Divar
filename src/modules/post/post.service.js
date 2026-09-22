@@ -20,6 +20,10 @@ class PostService {
     async create(dto) {
         return await this.#model.create(dto)
     }
+
+    async find(query = {}) {
+        return await this.#model.find(query)
+    }
 }
 
 module.exports = new PostService()
