@@ -52,6 +52,7 @@ class PostController {
 
   async create(req, res, next) {
     try {
+      const userId = req.user._id
       const images = req?.files?.map(image => image?.path?.slice(7))
       const { title_post: title, description: content, lat, lng, category } = req.body;
       const options = removePropertyInObject(req.body, [
@@ -70,6 +71,7 @@ class PostController {
       }
       const { address, province, city, district } = await getAddressDetail(lat, lng);
       await this.#service.create({
+        userId,
         title,
         content,
         category: new Types.ObjectId(category),
@@ -93,7 +95,7 @@ class PostController {
     try {
       const userId = req.user._id
       const posts = await this.#service.find(userId)
-      return res.render("./pages/panel/create-post.ejs", { posts })
+      return res.render("./pages/panel/create-post.ejs", { posts, count: posts.length })
     } catch (error) {
       next(error)
     }
