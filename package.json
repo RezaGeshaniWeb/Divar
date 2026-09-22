@@ -20,6 +20,7 @@
     "express-ejs-layouts": "^2.5.1",
     "http-codes": "^2.1.0",
     "http-errors": "^2.0.1",
+    "jalali-moment": "^3.3.11",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.1",
     "slugify": "^1.6.9",
