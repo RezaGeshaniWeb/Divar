@@ -7,6 +7,7 @@ const AllExceptionHandler = require("./src/common/exception/all-exception.handle
 const cookieParser = require("cookie-parser")
 const expressEjsLayouts = require("express-ejs-layouts")
 const moment = require("jalali-moment")
+const methodOverride = require("method-override")
 dotenv.config()
 
 async function main() {
@@ -18,6 +19,7 @@ async function main() {
     app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
     app.use(express.static("public"))
     app.use(expressEjsLayouts)
+    app.use(methodOverride('_method'))
     app.set("view engine", "ejs")
     app.set("layout", "./layouts/panel/main.ejs")
     app.use(mainRouter)
