@@ -89,9 +89,10 @@ class PostController {
     }
   }
 
-  async find(req, res, next) {
+  async findMyPosts(req, res, next) {
     try {
-      const posts = await this.#service.find()
+      const userId = req.user._id
+      const posts = await this.#service.find(userId)
       return res.render("./pages/panel/create-post.ejs", { posts })
     } catch (error) {
       next(error)
