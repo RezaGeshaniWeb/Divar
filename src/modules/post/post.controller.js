@@ -55,8 +55,9 @@ class PostController {
     try {
       const userId = req.user._id
       const images = req?.files?.map(image => image?.path?.slice(7))
-      const { title_post: title, description: content, lat, lng, category } = req.body;
+      const { title_post: title, description: content, lat, lng, category, amount } = req.body;
       const options = removePropertyInObject(req.body, [
+        "amount",
         "title_post",
         "description",
         "lat",
@@ -73,6 +74,7 @@ class PostController {
       const { address, province, city, district } = await getAddressDetail(lat, lng);
       await this.#service.create({
         userId,
+        amount,
         title,
         content,
         category: new Types.ObjectId(category),
@@ -125,6 +127,17 @@ class PostController {
       const post = await this.#service.checkExist(id)
       res.locals.layout = "./layouts/website/main.ejs";
       res.render("./pages/home/post.ejs", { post })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async postList(req, res, next) {
+    try {
+      const query = req.query
+      const post = await this.#service.findAll(query)
+      res.locals.layout = "./layouts/website/main.ejs";
+      res.render("./pages/home/index.ejs", { posts })
     } catch (error) {
       next(error)
     }

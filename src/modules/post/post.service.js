@@ -5,15 +5,18 @@ const { isValidObjectId } = require("mongoose");
 const createHttpError = require("http-errors");
 const PostMessage = require("./post.messages");
 const { Types } = require("mongoose");
+const CategoryModel = require("../category/category.model");
 
 class PostService {
     #model;
     #optionModel;
+    #categoryModel;
 
     constructor() {
         autoBind(this)
         this.#model = PostModel;
         this.#optionModel = OptionModel;
+        this.#categoryModel = CategoryModel;
     }
 
     async getCategoryOptions(categoryId) {
@@ -69,6 +72,28 @@ class PostService {
         if (userId && isValidObjectId(userId))
             return await this.#model.find({ userId })
         throw new createHttpError.BadRequest(PostMessage.RequestNotValid)
+    }
+
+    async findAll(options) {
+        let { category, search } = options
+        const query = {}
+        if (category) {
+            const result = await this.#categoryModel.findOne({ slug: category })
+            if (result) {
+                query['category'] = result._id
+            } else {
+                return []
+            }
+        }
+        if (search) {
+            search = new RegExp(search, 'ig')
+            query['$or'] = [
+                { title: search },
+                { description: search },
+            ]
+        }
+        const posts = await this.#model.find(query, {}, { sort: { _id: -1 } })
+        return posts;
     }
 }
 
