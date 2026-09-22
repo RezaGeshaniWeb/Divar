@@ -11,6 +11,7 @@ const utf8 = require("utf8")
 
 class PostController {
   #service;
+  success_message;
 
   constructor() {
     autoBind(this);
@@ -83,17 +84,9 @@ class PostController {
         city,
         district,
       });
-      // return res.status(httpCodes.CREATED).json({
-      //   message: PostMessage.Created,
-      // });
 
-      const posts = await this.#service.find(userId)
-      return res.render("./pages/panel/create-post.ejs", {
-        posts,
-        count: posts.length,
-        success_message: PostMessage.Created,
-        error_message: null,
-      });
+      this.success_message = PostMessage.Created
+      return res.redirect('/post/my')
     } catch (error) {
       next(error);
     }
@@ -103,12 +96,24 @@ class PostController {
     try {
       const userId = req.user._id
       const posts = await this.#service.find(userId)
-      return res.render("./pages/panel/create-post.ejs", { 
-        posts, 
-        count: posts.length, 
-        success_message: null,
+      res.render("./pages/panel/post.ejs", {
+        posts,
+        count: posts.length,
+        success_message: this.success_message,
         error_message: null,
       })
+      this.success_message = null
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async remove(req, res, next) {
+    try {
+      const { id } = req.params
+      await this.#service.remove(id)
+      this.success_message = PostMessage.Deleted
+      return res.redirect('/post/my')
     } catch (error) {
       next(error)
     }
