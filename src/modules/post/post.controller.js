@@ -118,6 +118,17 @@ class PostController {
       next(error)
     }
   }
+
+  async showPost(req, res, next) {
+    try {
+      const { id } = req.params
+      const post = await this.#service.checkExist(id)
+      res.locals.layout = "./layouts/website/main.ejs";
+      res.render("./pages/home/post.ejs", { post })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new PostController();

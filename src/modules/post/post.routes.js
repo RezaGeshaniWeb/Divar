@@ -7,6 +7,7 @@ const router = Router()
 
 router.get('/create', Authorization, postController.createPostPage)
 router.get('/my', Authorization, postController.findMyPosts)
+router.get('/:id', postController.showPost)
 router.delete('/delete/:id', Authorization, postController.remove)
 router.post('/create', Authorization, upload.array("images", 10), postController.create)
 
