@@ -26,7 +26,7 @@
           <input type="hidden" name="lng" id="lng">
           <input type="hidden" name="category" id="category" value="<%=category%>">
         <div class="p-2">
-          <labelانتخاب آدرس</label>
+          <label>انتخاب آدرس</label>
           <div id="map-element" class="w-100" style="height: 300px"></div>
         </div>
         <div class="p-2">
@@ -57,7 +57,7 @@
         <label><%=option.title%><%=option.required? " * ": ""%></label>
         <%if(option.type === "array"){%>
         <div class="p-2">
-          <select name="<%=option.title%>" class="form-select">
+          <select name="<%=option.key%>" class="form-select">
             <%option.enum.forEach(item => {%>
             <option value="<%=item%>"><%=item%></option>
             <%})%>
@@ -67,9 +67,9 @@
         <div class="p-2">
           <input
             type="text"
-            name="<%=option.title%>"
+            name="<%=option.key%>"
             class="form-control"
-            placeholder="<%=option.guid%>" />
+            placeholder="<%=option.guide || ''%>" />
         </div>
       <%}%>
       <%})%>

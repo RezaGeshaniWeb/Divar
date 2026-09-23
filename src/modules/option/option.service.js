@@ -39,7 +39,7 @@ class OptionService {
         } else {
             delete optionDto.category
         }
-        if (optionDto.slug) {
+        if (optionDto.key) {
             optionDto.key = slugify(optionDto.key, { trim: true, replacement: "_", lower: true })
             let categoryId = existOption.category
             if (optionDto.category) categoryId = optionDto.category

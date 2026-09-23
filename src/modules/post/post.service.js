@@ -79,19 +79,18 @@ class PostService {
         const query = {}
         if (category) {
             const result = await this.#categoryModel.findOne({ slug: category })
-            const categories = await this.#categoryModel.find({ parents: result._id }, { _id: 1 })
-            categories = categories.map(item => item._id)
-            if (result) {
-                query['category'] = { $in: [result._id, ...categories] }
-            } else {
+            if (!result) {
                 return []
             }
+            let categories = await this.#categoryModel.find({ parents: result._id }, { _id: 1 })
+            categories = categories.map(item => item._id)
+            query['category'] = { $in: [result._id, ...categories] }
         }
         if (search) {
             search = new RegExp(search, 'ig')
             query['$or'] = [
                 { title: search },
-                { description: search },
+                { content: search },
             ]
         }
         const posts = await this.#model.find(query, {}, { sort: { _id: -1 } })

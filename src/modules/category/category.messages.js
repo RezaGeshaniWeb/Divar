@@ -1,8 +1,8 @@
 const CategoryMessage = Object.freeze({
-    Created: "category created successfully",
-    NotFound: "category not found",
-    AlreadyExist: "category already exist",
-    Deleted: "category deleted successfully",
+    Created: "دسته‌بندی با موفقیت ایجاد شد",
+    NotFound: "دسته‌بندی یافت نشد",
+    AlreadyExist: "دسته‌بندی از قبل وجود دارد",
+    Deleted: "دسته‌بندی با موفقیت حذف شد",
 })
 
 module.exports = CategoryMessage;

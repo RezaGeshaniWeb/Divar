@@ -14,10 +14,11 @@ class AuthService {
     }
 
     async sendOTP(mobile) {
+        if (!mobile) throw new createHttpError.BadRequest(AuthMessage.MobileRequired)
         const user = await this.#model.findOne({ mobile })
         const now = new Date().getTime()
         const otp = {
-            code: randomInt(10000, 99999),
+            code: String(randomInt(10000, 99999)),
             expiresIn: now + (1000 * 60 * 2)
         }
         if (!user) {
@@ -33,10 +34,12 @@ class AuthService {
     }
 
     async checkOTP(mobile, code) {
+        if (!mobile) throw new createHttpError.BadRequest(AuthMessage.MobileRequired)
+        if (!code) throw new createHttpError.BadRequest(AuthMessage.CodeRequired)
         const user = await this.checkExistByMobile(mobile)
         const now = new Date().getTime()
         if (user?.otp?.expiresIn < now) throw new createHttpError.Unauthorized(AuthMessage.OtpCodeExpired)
-        if (user?.otp?.code !== code) throw new createHttpError.Unauthorized(AuthMessage.OtpCodeIsIncorrect)
+        if (String(user?.otp?.code) !== String(code)) throw new createHttpError.Unauthorized(AuthMessage.OtpCodeIsIncorrect)
         if (!user.verifiedMobile) user.verifiedMobile = true
         const accessToken = this.signToken({ mobile, id: user._id })
         user.accessToken = accessToken;

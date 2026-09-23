@@ -8,12 +8,13 @@ const cookieParser = require("cookie-parser")
 const expressEjsLayouts = require("express-ejs-layouts")
 const moment = require("jalali-moment")
 const methodOverride = require("method-override")
+const connectDB = require("./src/config/mongoose.config")
 dotenv.config()
 
 async function main() {
     const app = express()
-    const port = process.env.PORT
-    require("./src/config/mongoose.config")
+    const port = process.env.PORT || 3000
+    await connectDB()
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
     app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
@@ -29,6 +30,9 @@ async function main() {
     SwaggerConfig(app)
     NotFoundHandler(app)
     AllExceptionHandler(app)
-    app.listen(port, () => console.log(`server run on port ${port}`))
+    app.listen(port, () => console.log(`سرور روی پورت ${port} در حال اجرا است`))
 }
-main()
+main().catch((err) => {
+    console.log(err?.message ?? "راه‌اندازی سرور ناموفق بود")
+    process.exit(1)
+})

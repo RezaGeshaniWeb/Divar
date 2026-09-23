@@ -1,9 +1,9 @@
 const PostMessage = Object.freeze({
-    Created: "post created successfully",
-    NotFound: "post not found",
-    AlreadyExist: "post already exist",
-    Deleted: "post deleted successfully",
-    RequestNotValid: "request not valid",
+    Created: "آگهی با موفقیت ایجاد شد",
+    NotFound: "آگهی یافت نشد",
+    AlreadyExist: "آگهی از قبل وجود دارد",
+    Deleted: "آگهی با موفقیت حذف شد",
+    RequestNotValid: "درخواست نامعتبر است",
 })
 
 module.exports = PostMessage;

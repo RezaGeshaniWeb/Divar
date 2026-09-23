@@ -3,7 +3,7 @@ const PostMessage = require("./post.messages");
 const postService = require("./post.service");
 const CategoryModel = require("../category/category.model");
 const createHttpError = require("http-errors");
-const { default: httpCodes } = require("http-codes");
+const CategoryMessage = require("../category/category.messages");
 const { Types } = require("mongoose");
 const { removePropertyInObject } = require("../../common/utils/functions");
 const { getAddressDetail } = require("../../common/utils/http");
@@ -27,9 +27,8 @@ class PostController {
       if (slug) {
         slug = slug.trim();
         category = await CategoryModel.findOne({ slug });
-        if (!category) throw new createHttpError.NotFound(PostMessage.NotFound);
+        if (!category) throw new createHttpError.NotFound(CategoryMessage.NotFound);
         options = await this.#service.getCategoryOptions(category._id);
-        if (options.length === 0) options = null;
         showBack = true;
         match = {
           parent: category._id,
@@ -40,11 +39,16 @@ class PostController {
           $match: match,
         },
       ]);
+      if (slug && categories.length === 0) {
+        options = options || [];
+      } else if (!options || options.length === 0) {
+        options = null;
+      }
       res.render("./pages/panel/create-post.ejs", {
         categories,
         showBack,
         options,
-        category: category?._id.toString(),
+        category: category?._id?.toString(),
       });
     } catch (error) {
       next(error);
@@ -54,7 +58,10 @@ class PostController {
   async create(req, res, next) {
     try {
       const userId = req.user._id
-      const images = req?.files?.map(image => image?.path?.slice(7))
+      const images = req?.files?.map(image => {
+        const normalizedPath = String(image?.path || "").replace(/\\/g, "/")
+        return normalizedPath.replace(/^public\//, "")
+      }) || []
       const { title_post: title, description: content, lat, lng, category, amount } = req.body;
       const options = removePropertyInObject(req.body, [
         "amount",
@@ -68,7 +75,11 @@ class PostController {
       for (let key in options) {
         let value = options[key]
         delete options[key]
-        key = utf8.decode(key)
+        try {
+          key = utf8.decode(key)
+        } catch (e) {
+          // keep original key if decode fails
+        }
         options[key] = value
       }
       const { address, province, city, district } = await getAddressDetail(lat, lng);
@@ -98,7 +109,7 @@ class PostController {
     try {
       const userId = req.user._id
       const posts = await this.#service.find(userId)
-      res.render("./pages/panel/post.ejs", {
+      res.render("./pages/panel/posts.ejs", {
         posts,
         count: posts.length,
         success_message: this.success_message,
@@ -135,7 +146,7 @@ class PostController {
   async postList(req, res, next) {
     try {
       const query = req.query
-      const post = await this.#service.findAll(query)
+      const posts = await this.#service.findAll(query)
       res.locals.layout = "./layouts/website/main.ejs";
       res.render("./pages/home/index.ejs", { posts })
     } catch (error) {

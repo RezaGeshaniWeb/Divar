@@ -37,7 +37,7 @@ class CategoryController {
             const { id } = req.params;
             await this.#service.remove(id)
             return res.json({
-                messsage: CategoryMessage.Deleted
+                message: CategoryMessage.Deleted
             })
         } catch (error) {
             next(error)

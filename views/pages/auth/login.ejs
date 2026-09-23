@@ -6,39 +6,45 @@
         <div class="card mb-0">
           <div class="card-body">
             <a
-              href="./index.html"
+              href="/"
               class="text-nowrap logo-img text-center d-block py-3 w-100">
               <img src="/assets/images/logos/divar.svg" width="180" alt="" />
             </a>
             <p class="text-center">ورود به حساب کاربری</p>
-            <form>
+            <div id="alert-box" class="alert d-none" role="alert"></div>
+            <form id="login-form">
               <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label"
-                  >شماره موبایل</label
-                >
-                <input type="text" class="form-control" />
+                <label for="mobile" class="form-label">شماره موبایل</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="mobile"
+                  name="mobile"
+                  placeholder="09xxxxxxxxx"
+                  required />
               </div>
-              <div
-                class="d-flex align-items-center justify-content-between mb-4">
-                <div class="form-check">
-                  <input
-                    class="form-check-input primary"
-                    type="checkbox"
-                    value=""
-                    id="flexCheckChecked"
-                    checked />
-                  <label
-                    class="form-check-label text-dark"
-                    for="flexCheckChecked">
-                    مرا به خاطر بسپار
-                  </label>
-                </div>
+              <div class="mb-3 d-none" id="otp-box">
+                <label for="code" class="form-label">کد تایید</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="code"
+                  name="code"
+                  placeholder="کد ۵ رقمی" />
+                <small id="otp-hint" class="text-muted d-block mt-2"></small>
               </div>
-              <a
-                href="./index.html"
-                class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2"
-                >دریافت کد تایید</a
-              >
+              <button
+                type="button"
+                id="send-otp-btn"
+                class="btn btn-primary w-100 py-8 fs-4 mb-3 rounded-2">
+                دریافت کد تایید
+              </button>
+              <button
+                type="button"
+                id="check-otp-btn"
+                class="btn btn-success w-100 py-8 fs-4 mb-4 rounded-2 d-none">
+                ورود
+              </button>
             </form>
           </div>
         </div>
@@ -46,3 +52,75 @@
     </div>
   </div>
 </div>
+<script>
+  const alertBox = document.getElementById("alert-box");
+  const otpBox = document.getElementById("otp-box");
+  const otpHint = document.getElementById("otp-hint");
+  const sendOtpBtn = document.getElementById("send-otp-btn");
+  const checkOtpBtn = document.getElementById("check-otp-btn");
+  const mobileInput = document.getElementById("mobile");
+  const codeInput = document.getElementById("code");
+
+  function showAlert(message, type = "info") {
+    alertBox.className = `alert alert-${type}`;
+    alertBox.textContent = message;
+    alertBox.classList.remove("d-none");
+  }
+
+  sendOtpBtn.addEventListener("click", async () => {
+    const mobile = mobileInput.value.trim();
+    if (!mobile) {
+      showAlert("لطفاً شماره موبایل را وارد کنید", "warning");
+      return;
+    }
+    try {
+      const response = await fetch("/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        showAlert(data.message || "خطا در ارسال کد تایید", "danger");
+        return;
+      }
+      otpBox.classList.remove("d-none");
+      checkOtpBtn.classList.remove("d-none");
+      if (data.code) {
+        otpHint.textContent = `کد تایید (حالت توسعه): ${data.code}`;
+        codeInput.value = data.code;
+      }
+      showAlert(data.message, "success");
+    } catch (error) {
+      showAlert("خطا در برقراری ارتباط با سرور", "danger");
+    }
+  });
+
+  checkOtpBtn.addEventListener("click", async () => {
+    const mobile = mobileInput.value.trim();
+    const code = codeInput.value.trim();
+    if (!mobile || !code) {
+      showAlert("شماره موبایل و کد تایید الزامی است", "warning");
+      return;
+    }
+    try {
+      const response = await fetch("/auth/check-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile, code }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        showAlert(data.message || "ورود ناموفق بود", "danger");
+        return;
+      }
+      showAlert(data.message, "success");
+      setTimeout(() => {
+        window.location.href = "/panel";
+      }, 500);
+    } catch (error) {
+      showAlert("خطا در برقراری ارتباط با سرور", "danger");
+    }
+  });
+</script>

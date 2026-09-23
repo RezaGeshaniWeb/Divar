@@ -15,9 +15,10 @@ class AuthController {
     async sendOTP(req, res, next) {
         try {
             const { mobile } = req.body;
-            await this.#service.sendOTP(mobile)
+            const user = await this.#service.sendOTP(mobile)
             return res.json({
-                message: AuthMessage.SendOtpSuccessfully
+                message: AuthMessage.SendOtpSuccessfully,
+                code: user?.otp?.code
             })
         } catch (error) {
             next(error)
@@ -41,7 +42,11 @@ class AuthController {
     
     async logout(req, res, next) {
         try {
-            return res.clearCookie(CookieNames.AccessToken).status(200).json({
+            res.clearCookie(CookieNames.AccessToken)
+            if (req.accepts("html") === "html") {
+                return res.redirect("/auth/login")
+            }
+            return res.status(200).json({
                 message: AuthMessage.Logout
             })
         } catch (error) {
