@@ -6,7 +6,7 @@ function SwaggerConfig(app) {
     swaggerDefinition: {
       openapi: '3.0.1',
       info: {
-        title: "Divar-Backend",
+        title: "Divar-API",
         description: "Express JS Project",
         version: "1.0.0",
       },
